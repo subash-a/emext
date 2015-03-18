@@ -1,7 +1,8 @@
 
 (put 'upcase-region 'disabled nil)
 
-(setq backup-directory "c:/temp/")
+;; Setup Backup Directory
+;;(setq backup-directory "c:/temp/")
 
 (setq backup-directory-alist
       `((".*" . , backup-directory)))
@@ -20,8 +21,8 @@
 (add-to-list 'auto-mode-alist '("\\.xsjs\\'" . javascript-mode))
 (autoload `javascript-mode "javascript" nil t)
 
-(load-library "myutils/ace-jump-mode.el")
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+;;(load-library "myutils/ace-jump-mode.el")
+;;(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
@@ -55,16 +56,16 @@
 ;;(set-face-attribute 'default nil :font "Consolas")
 (set-face-attribute 'default nil :height 130)
 ;;Setting up home directory
-(setq default-directory "c:/Users/I065682/git_repos/project-sentinel/user_experience/")
+;;(setq default-directory "c:/Users/I065682/git_repos/project-sentinel/user_experience/")
 (cd default-directory)
 ;; Setting up gnus email and news feed
 (setq user-mail-address "s7subash@gmail.com")
 (setq user-full-name "Subhash Sharma")
 ;; Loading custom libraries when needed to use
-(load-library "myutils/learn.el")
+;;(load-library "myutils/learn.el")
 ;; Setting column markers for 80 column limit
 ;; Enabling Macros when loading the editor
-(load-library "mymacros.el")
+;;(load-library "mymacros.el")
 ;;Enabling awesome CUA Mode for Selecting rectangles regions
 (setq cua-enable-cua-keys nil)
 (setq cua-highlight-region-shift-only t) ;; no transient mode mark
