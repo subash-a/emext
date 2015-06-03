@@ -1,8 +1,7 @@
-
 (put 'upcase-region 'disabled nil)
 
 ;; Setup Backup Directory
-;;(setq backup-directory "c:/temp/")
+(setq backup-directory "~/.backups/")
 
 (setq backup-directory-alist
       `((".*" . , backup-directory)))
@@ -39,7 +38,7 @@
  ;; If there is more than one, they won't work right.
  '(column-marker-1 81)
  '(column-number-mode t)
- '(initial-frame-alist (quote ((fullscreen . maximized))))
+ ;;'(initial-frame-alist (quote ((fullscreen . maximized))))
  '(linum-mode 1)
  '(size-indication-mode t)
  '(tool-bar-mode nil)
@@ -50,7 +49,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#242424" :foreground "#f6f3e8" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 130 :width normal :foundry "outline" :family "Consolas")))))
+ '(default ((t (:inherit nil :stipple nil :background "#242424" :foreground "#f6f3e8" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 130 :width normal :foundry "outline" :family "Monaco")))))
 
 
 ;;(set-face-attribute 'default nil :font "Consolas")
@@ -80,5 +79,10 @@
 (global-set-key (kbd "RET") 'newline-and-indent)
 ;; Disabling startup splash screen
 (setq inhibit-splash-screen t)
-;; Disabling startup screen
-(setq inhibit-startup-screen t)
+;; Deleting white space before saving a file
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+;; Setting up for single space on hitting SPC bar
+(global-set-key (kbd "SPC") 'just-one-space)
+;; Setting up key bindings for Ace Jump Mode
+(global-set-key (kbd "C-x j") 'ace-jump-mode)
+
