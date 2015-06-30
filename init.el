@@ -1,5 +1,3 @@
-(put 'upcase-region 'disabled nil)
-
 ;; Setup Backup Directory
 (setq backup-directory "~/.backups/")
 
@@ -39,11 +37,11 @@
  '(column-marker-1 81)
  '(column-number-mode t)
  ;;'(initial-frame-alist (quote ((fullscreen . maximized))))
- '(linum-mode 1)
+ '(global-linum-mode 1)
  '(size-indication-mode t)
  '(tool-bar-mode nil)
- '(tooltip-mode nil))
-
+ '(tooltip-mode nil)
+ '(tab-width 4))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -81,9 +79,25 @@
 (setq inhibit-splash-screen t)
 ;; Deleting white space before saving a file
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+;; Removing tabs before saving a file
+;;(add-hook 'before-save-hook 'untabify)
 ;; Setting up for single space on hitting SPC bar
 (global-set-key (kbd "SPC") 'just-one-space)
 ;; Setting up key bindings for Ace Jump Mode
 (global-set-key (kbd "C-x j") 'ace-jump-mode)
-;; Setting up CxCb to bind to ibuffer
+;; Setting up key binding for ibuffer(awesome) to the buffer list
 (global-set-key (kbd "C-x C-b") 'ibuffer)
+;; Setting up path for node support by including the path to node_modules
+(setenv "PATH" (concat "/usr/local/bin:" (getenv "PATH")))
+;; Setting up the exec path since all node commands are found here
+(add-to-list 'exec-path "/usr/local/bin")
+;; Setting up JSCS for emacs
+;; (add-to-list 'load-path "/Users/subhash_sharma/.emacs.d/elpa/emacs-jscs")
+;; (autoload 'jscs-indent-apply "jscs" nil t)
+;; (autoload 'jscs-fix "jscs" nil t)
+;; (autoload 'jscs-fix-before-save "jscs" nil t)
+;; (with-eval-after-load 'js
+;;  (add-hook 'js-mode-hook #'jscs-indent-apply))
+;; (with-eval-after-load 'js2-mode
+;;  (add-hook 'js-mode-hook #'jscs-indent-apply))
+;; (add-hook 'before-save-hook #'jscs-fix-before-save)
