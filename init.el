@@ -128,3 +128,4 @@
 (ac-config-default)
 ;;-------------------------- AUTOPAIR SETTINGS -------------------------------
 (require 'autopair)
+(autopair-global-mode)
