@@ -1,4 +1,7 @@
-;; Setup Backup Directory
+;;
+;; ============================= MY EMACS INIT ==============================
+;;
+;; ------------------------ BACKUP DIRECTORY ---------------------------------
 (setq backup-directory "~/.backups/")
 
 (setq backup-directory-alist
@@ -7,28 +10,29 @@
 (setq auto-save-file-name-transforms
       `((".*" , backup-directory t)))
 
-;;(setq url-using-proxy t)
-;;(setq url-proxy-services
-;;      `(("http" . "proxy:8080")
-;;	("https" . "proxy:8080")))
-;;
-(add-to-list 'auto-mode-alist '("\\.js\\'" . javascript-mode))
-(autoload `javascript-mode "javascript" nil t)
+;;------------------------------ PACKAGES ------------------------------------
+(load "package")
+(package-initialize)
+(add-to-list 'package-archives
+	     '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
-(add-to-list 'auto-mode-alist '("\\.xsjs\\'" . javascript-mode))
-(autoload `javascript-mode "javascript" nil t)
+;;------------------------ MY PACKAGE LIST -----------------------------------
+(defvar subash/packages '(auto-complete autopair column-marker deft magit org smex) "Default Packages")
 
-;;(load-library "myutils/ace-jump-mode.el")
-;;(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+(defun all-my-packages-installed-p ()
+  (setq my-packages-installed t)
+  (dolist (pkg subash/packages my-packages-installed)
+	(if (package-installed-p pkg)
+		(setq my-packages-installed nil))))
 
-  ;; Adding New package installation archives
-(require `package)
-(add-to-list `package-archives
-	     `("melpa" . "http://melpa.milkbox.net/packages/") t)
+(unless (all-my-packages-installed-p)
+  (message "%s" "Refreshing packages...")
+  (package-refresh-contents)
+  (dolist (pkg subash/packages)
+	(if (not (package-installed-p pkg))
+		(package-install pkg))))
+
+;;----------------------- CUSTOM VARIABLES -----------------------------------
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -36,68 +40,91 @@
  ;; If there is more than one, they won't work right.
  '(column-marker-1 81)
  '(column-number-mode t)
- ;;'(initial-frame-alist (quote ((fullscreen . maximized))))
  '(global-linum-mode 1)
  '(size-indication-mode t)
+ '(tab-width 4)
+ '(echo-keystrokes 0.1)
+ '(use-dialog-box nil)
+ '(visible-bell t)
  '(tool-bar-mode nil)
  '(tooltip-mode nil)
- '(tab-width 4))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#242424" :foreground "#f6f3e8" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 130 :width normal :foundry "outline" :family "Monaco")))))
+ '(custom-safe-themes
+   (quote
+	("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "55ed02951e7b458e4cd18837eefa1956884c9afd22bb514f697fd1d2d1abb3d3" default))))
 
+;; ------------------------- SPLASH SCREEN -----------------------------------
+;; Disabling startup splash screen, setting the intial message to nil and
+;; starting the editor in org-mode
+(setq inhibit-splash-screen t
+	  initial-scratch-message nil
+	  initial-major-mode 'org-mode)
 
-;;(set-face-attribute 'default nil :font "Consolas")
-(set-face-attribute 'default nil :height 130)
-;;Setting up home directory
-;;(setq default-directory "c:/Users/I065682/git_repos/project-sentinel/user_experience/")
-(cd default-directory)
-;; Setting up gnus email and news feed
-(setq user-mail-address "s7subash@gmail.com")
-(setq user-full-name "Subhash Sharma")
-;; Loading custom libraries when needed to use
-;;(load-library "myutils/learn.el")
-;; Setting column markers for 80 column limit
-;; Enabling Macros when loading the editor
-;;(load-library "mymacros.el")
-;;Enabling awesome CUA Mode for Selecting rectangles regions
-(setq cua-enable-cua-keys nil)
-(setq cua-highlight-region-shift-only t) ;; no transient mode mark
-(setq cua-toggle-set-mark nil)
-(cua-mode)
-;; Setting the tags file for searching
-(setq tags-table-list
-      '("~/" "."))
+;; ----------------------------- GENERAL SETTINGS ----------------------------
+;; Text Marking
+(delete-selection-mode t)
+(transient-mark-mode t)
+(setq x-select-enable-clipboard t)
+
+;; Removing scroll bars, tool bar and menu bar
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+
+;; show matching parenthesis
+(show-paren-mode t)
+
+;; I dont like to type yes and no I would rather type y and n
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;;----------------------------- FONT FACE SETTINGS ---------------------------
+(setq frame-title-format '(buffer-file-name "%f" ("%b")))
+(set-face-attribute 'default nil
+					  :family "Monaco"
+					  :height 125
+					  :weight 'normal
+					  :width 'normal)
+
+;; ------------------------ KEY MAPPINGS -------------------------------------
 ;; Setting the keyboard mapping of the Ctrl+c u to toggle cua-mode
 (global-set-key (kbd "C-c u") 'cua-mode)
 ;; Setting the keybinding for Enter to Ctrl-j for return and indent
 (global-set-key (kbd "RET") 'newline-and-indent)
-;; Disabling startup splash screen
-(setq inhibit-splash-screen t)
-;; Deleting white space before saving a file
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-;; Removing tabs before saving a file
-;;(add-hook 'before-save-hook 'untabify)
 ;; Setting up for single space on hitting SPC bar
 (global-set-key (kbd "SPC") 'just-one-space)
 ;; Setting up key bindings for Ace Jump Mode
 (global-set-key (kbd "C-x j") 'ace-jump-mode)
 ;; Setting up key binding for ibuffer(awesome) to the buffer list
 (global-set-key (kbd "C-x C-b") 'ibuffer)
+;; Commenting and Uncommenting a region
+(global-set-key (kbd "C-;") 'comment-or-uncomment-region)
+;; Increase the text size incrementally
+(global-set-key (kbd "C-+") 'text-scale-increase)
+;; Decrease the text size
+(global-set-key (kbd "C--") 'text-scale-decrease)
+
+;;--------------------------- HOOKS ------------------------------------------
+;; Deleting white space before saving a file
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;;-------------------------- PATH AND ENV SETTINGS ---------------------------
 ;; Setting up path for node support by including the path to node_modules
 (setenv "PATH" (concat "/usr/local/bin:" (getenv "PATH")))
 ;; Setting up the exec path since all node commands are found here
 (add-to-list 'exec-path "/usr/local/bin")
-;; Setting up JSCS for emacs
-;; (add-to-list 'load-path "/Users/subhash_sharma/.emacs.d/elpa/emacs-jscs")
-;; (autoload 'jscs-indent-apply "jscs" nil t)
-;; (autoload 'jscs-fix "jscs" nil t)
-;; (autoload 'jscs-fix-before-save "jscs" nil t)
-;; (with-eval-after-load 'js
-;;  (add-hook 'js-mode-hook #'jscs-indent-apply))
-;; (with-eval-after-load 'js2-mode
-;;  (add-hook 'js-mode-hook #'jscs-indent-apply))
-;; (add-hook 'before-save-hook #'jscs-fix-before-save)
+
+;;--------------------------- THEME ------------------------------------------
+(if window-system
+	(load-theme 'solarized-light t)
+  (load-theme 'wombat t))
+
+;;---------------------------- SMEX SETTINGS ---------------------------------
+(setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
+(smex-initialize)
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+
+;;------------------------ AUTOCOMPLETE SETTINGS -----------------------------
+(require 'auto-complete-config)
+(ac-config-default)
+;;-------------------------- AUTOPAIR SETTINGS -------------------------------
+(require 'autopair)
