@@ -17,7 +17,7 @@
 	     '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
 ;;------------------------ MY PACKAGE LIST -----------------------------------
-(defvar subash/packages '(auto-complete autopair column-marker deft magit org smex) "Default Packages")
+(defvar subash/packages '(auto-complete autopair column-marker deft flx-ido magit org projectile smex web-mode yaml-mode) "Default Packages")
 
 (defun all-my-packages-installed-p ()
   (setq my-packages-installed t)
@@ -93,6 +93,8 @@
 (global-set-key (kbd "SPC") 'just-one-space)
 ;; Setting up key bindings for Ace Jump Mode
 (global-set-key (kbd "C-x j") 'ace-jump-mode)
+;; Setting up key binding for magit status
+(global-set-key (kbd "C-x g") 'magit-status)
 ;; Setting up key binding for ibuffer(awesome) to the buffer list
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 ;; Commenting and Uncommenting a region
@@ -101,7 +103,8 @@
 (global-set-key (kbd "C-+") 'text-scale-increase)
 ;; Decrease the text size
 (global-set-key (kbd "C--") 'text-scale-decrease)
-
+;; Search file using projectile
+(global-set-key (kbd "C-c C-f") 'projectile-find-file)
 ;;--------------------------- HOOKS ------------------------------------------
 ;; Deleting white space before saving a file
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -129,3 +132,18 @@
 ;;-------------------------- AUTOPAIR SETTINGS -------------------------------
 (require 'autopair)
 (autopair-global-mode)
+
+;;--------------------------- WEB MODE ---------------------------------------
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(defun my-web-mode-hook ()
+  "customized settings for my web mode hook"
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-enable-auto-closing t)
+  (setq web-mode-enable-auto-pairing t))
+(add-hook 'web-hook-mode 'my-web-hook-mode)
+;;------------------------ PROJECTILE SETTINGS -------------------------------
+(projectile-global-mode t)
+(setq projectile-enable-caching t)
