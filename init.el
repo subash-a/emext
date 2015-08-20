@@ -17,7 +17,7 @@
 	     '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
 ;;------------------------ MY PACKAGE LIST -----------------------------------
-(defvar subash/packages '(auto-complete autopair column-marker deft flx-ido magit org projectile smex web-mode yaml-mode) "Default Packages")
+(defvar subash/packages '(auto-complete autopair column-marker company deft flx-ido go-mode magit org projectile smex tide web-mode yaml-mode) "Default Packages")
 
 (defun all-my-packages-installed-p ()
   (setq my-packages-installed t)
@@ -105,6 +105,8 @@
 (global-set-key (kbd "C--") 'text-scale-decrease)
 ;; Search file using projectile
 (global-set-key (kbd "C-c C-f") 'projectile-find-file)
+;; Toggle line break on and off
+(global-set-key (kbd "C-c l") 'toggle-truncate-lines)
 ;;--------------------------- HOOKS ------------------------------------------
 ;; Deleting white space before saving a file
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -114,6 +116,8 @@
 (setenv "PATH" (concat "/usr/local/bin:" (getenv "PATH")))
 ;; Setting up the exec path since all node commands are found here
 (add-to-list 'exec-path "/usr/local/bin")
+;; Setting up node exec path since version specific node commands can be found here
+(add-to-list 'exec-path "/Users/subhash_sharma/.nvm/versions/node/v0.12.7/bin")
 
 ;;--------------------------- THEME ------------------------------------------
 (if window-system
@@ -147,3 +151,13 @@
 ;;------------------------ PROJECTILE SETTINGS -------------------------------
 (projectile-global-mode t)
 (setq projectile-enable-caching t)
+;;----------------------- COMPANY MODE SETTINGS ------------------------------
+(global-set-key (kbd "C-c C-t") 'company-complete)
+;;----------------------- TIDE MODE SETTINGS ---------------------------------
+(add-hook 'typescript-mode-hook
+		  (lambda ()
+			(tide-setup)
+			(flycheck-mode t)
+			(setq flycheck-check-syntax-automatically '(save-mode-enabled))
+			(eldoc-mode )))
+(setq company-tooltip-align-annotations t)
