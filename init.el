@@ -79,8 +79,8 @@
 ;;----------------------------- FONT FACE SETTINGS ---------------------------
 (setq frame-title-format '(buffer-file-name "%f" ("%b")))
 (set-face-attribute 'default nil
-					  :family "Monaco"
-					  :height 125
+					  :family "Hack"
+					  :height 135
 					  :weight 'normal
 					  :width 'normal)
 
@@ -105,6 +105,8 @@
 (global-set-key (kbd "C--") 'text-scale-decrease)
 ;; Search file using projectile
 (global-set-key (kbd "C-c C-f") 'projectile-find-file)
+;; Projectile switch project
+(global-set-key (kbd "C-c C-p") 'projectile-switch-project)
 ;; Toggle line break on and off
 (global-set-key (kbd "C-c l") 'toggle-truncate-lines)
 ;;--------------------------- HOOKS ------------------------------------------
@@ -125,6 +127,7 @@
   (load-theme 'wombat t))
 
 ;;---------------------------- SMEX SETTINGS ---------------------------------
+(require 'smex)
 (setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
 (smex-initialize)
 (global-set-key (kbd "M-x") 'smex)
@@ -136,10 +139,25 @@
 ;;-------------------------- AUTOPAIR SETTINGS -------------------------------
 (require 'autopair)
 (autopair-global-mode)
+;;--------------------------- ORG MODE ---------------------------------------
+(require 'org)
+;; Overriding some solarized theme settings which mess with org mode
+(if (boundp 'solarized-use-variable-pitch)
+	((setq solarized-use-variable-pitch nil)
+	 (setq solarized-height-plus-4 1.0)
+	 (setq solarized-height-plus-3 1.0)
+	 (setq solarized-height-plus-2 1.0)
+	 (setq solarized-height-plus-1 1.0)
+	 (setq solarized-height-minus-1 1.0)))
 
-;;--------------------------- WEB MODE ---------------------------------------
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+;;--------------------------- CUSTOMIZED HOOKS--------------------------------
+(defun start-tide-company ()
+  "Start the Tide mode with Company mode and Flycheck"
+  (tide-setup)
+  (flycheck-mode t)
+  (setq flycheck-check-syntax-automatically '(save-mode-enabled))
+  (eldoc-mode )
+  (company-mode t))
 (defun my-web-mode-hook ()
   "customized settings for my web mode hook"
   (setq web-mode-markup-indent-offset 2)
@@ -147,17 +165,28 @@
   (setq web-mode-code-indent-offset 2)
   (setq web-mode-enable-auto-closing t)
   (setq web-mode-enable-auto-pairing t))
+;;--------------------------- DEFT MODE --------------------------------------
+(require 'deft)
+(setq deft-extensions '("txt" "org" "md"))
+(setq deft-directory "~/Dropbox/Notes")
+(setq deft-recursive t)
+(setq deft-default-extension "org")
+(global-set-key [f8] 'deft)
+;;--------------------------- WEB MODE ---------------------------------------
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx?\\'" . web-mode))
 (add-hook 'web-hook-mode 'my-web-hook-mode)
+;;-------------------------- TYPESCRIPT MODE----------------------------------
+(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescript-mode))
 ;;------------------------ PROJECTILE SETTINGS -------------------------------
+(require 'projectile)
 (projectile-global-mode t)
 (setq projectile-enable-caching t)
 ;;----------------------- COMPANY MODE SETTINGS ------------------------------
+(require 'company)
 (global-set-key (kbd "C-c C-t") 'company-complete)
 ;;----------------------- TIDE MODE SETTINGS ---------------------------------
-(add-hook 'typescript-mode-hook
-		  (lambda ()
-			(tide-setup)
-			(flycheck-mode t)
-			(setq flycheck-check-syntax-automatically '(save-mode-enabled))
-			(eldoc-mode )))
+(require 'tide)
+(add-hook 'typescript-mode-hook 'start-tide-company)
 (setq company-tooltip-align-annotations t)
