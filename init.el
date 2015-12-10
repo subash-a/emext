@@ -8,29 +8,29 @@
       `((".*" . , backup-directory)))
 
 (setq auto-save-file-name-transforms
-      `((".*" , backup-directory t)))
+      `((".*" , backup-directory nil)))
 
 ;;------------------------------ PACKAGES ------------------------------------
 (load "package")
 (package-initialize)
 (add-to-list 'package-archives
-	     '("melpa" . "http://melpa.milkbox.net/packages/") t)
+			 '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
-;;------------------------ MY PACKAGE LIST -----------------------------------
-(defvar subash/packages '(auto-complete autopair column-marker company deft flx-ido go-mode magit org projectile smex tide web-mode yaml-mode) "Default Packages")
+;; ;;------------------------ MY PACKAGE LIST -----------------------------------
+(defvar subash/packages '(auto-complete autopair column-marker company deft flx-ido go-mode magit org projectile smex solarized-theme tide web-mode yaml-mode) "Default Packages")
 
-(defun all-my-packages-installed-p ()
-  (setq my-packages-installed t)
-  (dolist (pkg subash/packages my-packages-installed)
-	(if (package-installed-p pkg)
-		(setq my-packages-installed nil))))
+;; (defun all-my-packages-installed-p ()
+;;   (setq my-packages-installed t)
+;;   (dolist (pkg subash/packages my-packages-installed)
+;; 	(if (package-installed-p pkg)
+;; 		(setq my-packages-installed nil))))
 
-(unless (all-my-packages-installed-p)
-  (message "%s" "Refreshing packages...")
-  (package-refresh-contents)
-  (dolist (pkg subash/packages)
-	(if (not (package-installed-p pkg))
-		(package-install pkg))))
+;; (unless (all-my-packages-installed-p)
+;;   (message "%s" "Refreshing packages...")
+;;   (package-refresh-contents)
+;;   (dolist (pkg subash/packages)
+;; 	(if (not (package-installed-p pkg))
+;; 		(package-install pkg))))
 
 ;;----------------------- CUSTOM VARIABLES -----------------------------------
 (custom-set-variables
@@ -112,14 +112,18 @@
 ;;--------------------------- HOOKS ------------------------------------------
 ;; Deleting white space before saving a file
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-
+;; (defun pre-save-typescript ()
+;;   "Before saving typescript files do this"
+;;   (if (eq major-mode 'typescript-mode)
+;; 	  (shell-command-on-region (point-min) (point-max) "/Users/subhash_sharma/Modelogiq/frontend/node_modules/.bin/tsfmt --stdin" (current-buffer) t)))
+;; (add-hook 'before-save-hook 'pre-save-typescript)
 ;;-------------------------- PATH AND ENV SETTINGS ---------------------------
 ;; Setting up path for node support by including the path to node_modules
 (setenv "PATH" (concat "/usr/local/bin:" (getenv "PATH")))
 ;; Setting up the exec path since all node commands are found here
 (add-to-list 'exec-path "/usr/local/bin")
 ;; Setting up node exec path since version specific node commands can be found here
-(add-to-list 'exec-path "/Users/subhash_sharma/.nvm/versions/node/v0.12.7/bin")
+(add-to-list 'exec-path "/Users/subhash_sharma/.nvm/versions/node/v5.0/bin")
 
 ;;--------------------------- THEME ------------------------------------------
 (if window-system
@@ -140,45 +144,36 @@
 (require 'autopair)
 (autopair-global-mode)
 ;;--------------------------- ORG MODE ---------------------------------------
-(require 'org)
+;; (require 'org)
 ;; Overriding some solarized theme settings which mess with org mode
-(if (boundp 'solarized-use-variable-pitch)
-	((setq solarized-use-variable-pitch nil)
-	 (setq solarized-height-plus-4 1.0)
-	 (setq solarized-height-plus-3 1.0)
-	 (setq solarized-height-plus-2 1.0)
-	 (setq solarized-height-plus-1 1.0)
-	 (setq solarized-height-minus-1 1.0)))
-
+;; (require 'solarized)
+;; (defun my-org-hook ()
+;;   (setq solarized-use-variable-pitch nil)
+;;   (setq solarized-height-plus-4 1.0)
+;;   (setq solarized-height-plus-3 1.0)
+;;   (setq solarized-height-plus-2 1.0)
+;;   (setq solarized-height-plus-1 1.0)
+;;   (setq solarized-height-minus-1 1.0))
+;; (add-hook 'org-mode-hook 'my-org-hook)
 ;;--------------------------- CUSTOMIZED HOOKS--------------------------------
-(defun start-tide-company ()
-  "Start the Tide mode with Company mode and Flycheck"
-  (tide-setup)
-  (flycheck-mode t)
-  (setq flycheck-check-syntax-automatically '(save-mode-enabled))
-  (eldoc-mode )
-  (company-mode t))
-(defun my-web-mode-hook ()
-  "customized settings for my web mode hook"
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
-  (setq web-mode-code-indent-offset 2)
-  (setq web-mode-enable-auto-closing t)
-  (setq web-mode-enable-auto-pairing t))
 ;;--------------------------- DEFT MODE --------------------------------------
 (require 'deft)
 (setq deft-extensions '("txt" "org" "md"))
 (setq deft-directory "~/Dropbox/Notes")
 (setq deft-recursive t)
 (setq deft-default-extension "org")
+(setq deft-auto-save-interval 0)
 (global-set-key [f8] 'deft)
-;;--------------------------- WEB MODE ---------------------------------------
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx?\\'" . web-mode))
-(add-hook 'web-hook-mode 'my-web-hook-mode)
 ;;-------------------------- TYPESCRIPT MODE----------------------------------
-(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescript-mode))
+;; Added typescript linter for checking code when saved
+(require 'flycheck)
+(flycheck-define-checker typescript-tslint
+  "Linter for typescript code"
+  :command ("/Users/subhash_sharma/Modelogiq/frontend/node_modules/.bin/tslint" "--config /Users/subhash_sharma/Modelogiq/frontend/tslint.json" source-original)
+  :error-patterns ((error line-start (file-name) "[" line ", " column "]:" (message) line-end))
+  :modes (typescript-mode))
+(add-to-list 'flycheck-checkers 'typescript-tslint)
+(setq flycheck-check-syntax-automatically '(mode-enabled save))
 ;;------------------------ PROJECTILE SETTINGS -------------------------------
 (require 'projectile)
 (projectile-global-mode t)
@@ -187,6 +182,29 @@
 (require 'company)
 (global-set-key (kbd "C-c C-t") 'company-complete)
 ;;----------------------- TIDE MODE SETTINGS ---------------------------------
+(defun start-tide-company ()
+  "Start the Tide mode with Company mode and Flycheck"
+  (tide-setup)
+  (flycheck-mode t)
+  (eldoc-mode )
+  (company-mode t))
+(require 'typescript-mode)
 (require 'tide)
 (add-hook 'typescript-mode-hook 'start-tide-company)
 (setq company-tooltip-align-annotations t)
+;;--------------------------- WEB MODE ---------------------------------------
+
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(add-hook 'web-mode-hook
+		  (lambda ()
+			"customized settings for my web mode hook"
+			(setq web-mode-markup-indent-offset 2)
+			(setq web-mode-css-indent-offset 2)
+			(setq web-mode-code-indent-offset 2)
+			(setq web-mode-enable-auto-closing t)
+			(setq web-mode-enable-auto-pairing t)
+			(when (string-equal "tsx" (file-name-extension buffer-file-name))
+			  (start-tide-company))))
