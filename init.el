@@ -10,6 +10,13 @@
 (setq auto-save-file-name-transforms
       `((".*" , backup-directory nil)))
 
+;;------------------------- LOAD FILES ---------------------------------------
+(add-to-list 'load-path "/Users/subhash_sharma/Code/tern/emacs/")
+(autoload 'tern-mode "tern.el" nil t)
+(eval-after-load 'tern
+  '(progn
+	 (require 'tern-auto-complete)
+	 (tern-ac-setup)))
 ;;------------------------------ PACKAGES ------------------------------------
 (load "package")
 (package-initialize)
@@ -76,6 +83,14 @@
 ;; I dont like to type yes and no I would rather type y and n
 (defalias 'yes-or-no-p 'y-or-n-p)
 
+;; Custom function for creating zsh term
+(defun zsh-term (name)
+  (interactive "Bname: ")
+  (ansi-term "/bin/zsh" name))
+;; Custom function for creating bash term
+(defun bash-term (name)
+  (interactive "Bname: ")
+  (ansi-term "/bin/bash" name))
 ;;----------------------------- FONT FACE SETTINGS ---------------------------
 (setq frame-title-format '(buffer-file-name "%f" ("%b")))
 (set-face-attribute 'default nil
@@ -95,6 +110,8 @@
 (global-set-key (kbd "C-x j") 'ace-jump-mode)
 ;; Setting up key binding for magit status
 (global-set-key (kbd "C-x g") 'magit-status)
+;; Setting up key binding for terminal support
+(global-set-key (kbd "C-x t") 'zsh-term)
 ;; Setting up key binding for ibuffer(awesome) to the buffer list
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 ;; Commenting and Uncommenting a region
@@ -123,11 +140,11 @@
 ;; Setting up the exec path since all node commands are found here
 (add-to-list 'exec-path "/usr/local/bin")
 ;; Setting up node exec path since version specific node commands can be found here
-(add-to-list 'exec-path "/Users/subhash_sharma/.nvm/versions/node/v5.0/bin")
+(add-to-list 'exec-path "/Users/subhash_sharma/.nvm/versions/node/v5.1.0/bin")
 
 ;;--------------------------- THEME ------------------------------------------
 (if window-system
-	(load-theme 'solarized-light t)
+	(load-theme 'solarized-dark t)
   (load-theme 'wombat t))
 
 ;;---------------------------- SMEX SETTINGS ---------------------------------
@@ -182,15 +199,15 @@
 (require 'company)
 (global-set-key (kbd "C-c C-t") 'company-complete)
 ;;----------------------- TIDE MODE SETTINGS ---------------------------------
-(defun start-tide-company ()
-  "Start the Tide mode with Company mode and Flycheck"
-  (tide-setup)
-  (flycheck-mode t)
-  (eldoc-mode )
-  (company-mode t))
 (require 'typescript-mode)
 (require 'tide)
-(add-hook 'typescript-mode-hook 'start-tide-company)
+(add-hook 'typescript-mode-hook
+		  (lambda ()
+			"Start the Tide mode with Company mode and Flycheck"
+			(tide-setup)
+			(flycheck-mode t)
+			(eldoc-mode )
+			(company-mode t)))
 (setq company-tooltip-align-annotations t)
 ;;--------------------------- WEB MODE ---------------------------------------
 
@@ -201,10 +218,15 @@
 (add-hook 'web-mode-hook
 		  (lambda ()
 			"customized settings for my web mode hook"
-			(setq web-mode-markup-indent-offset 2)
-			(setq web-mode-css-indent-offset 2)
-			(setq web-mode-code-indent-offset 2)
+			(setq web-mode-markup-indent-offset 4)
+			(setq web-mode-css-indent-offset 4)
+			(setq web-mode-code-indent-offset 4)
 			(setq web-mode-enable-auto-closing t)
 			(setq web-mode-enable-auto-pairing t)
 			(when (string-equal "tsx" (file-name-extension buffer-file-name))
-			  (start-tide-company))))
+			  (tide-setup)
+			  (flycheck-mode t)
+			  (eldoc-mode )
+			  (company-mode t))))
+;;---------------------- TERN MODE -------------------------------------------
+(add-hook 'js-mode-hook (lambda() (tern-mode t)))
