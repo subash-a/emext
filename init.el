@@ -26,7 +26,22 @@
 (when (memq window-system '(mac-ns))
   (exec-path-from-shell-initialize))
 ;; ;;------------------------ MY PACKAGE LIST -----------------------------------
-(defvar subash/packages '(auto-complete autopair column-marker company deft flx-ido go-mode grizzl magit org projectile smex solarized-theme tide web-mode yaml-mode) "Default Packages")
+(defvar subash/packages '(auto-complete autopair column-marker company company-go deft flx-ido go-mode grizzl magit org projectile smex solarized-theme tide web-mode yaml-mode) "Default Packages")
+(defun setup-editor ()
+  (interactive)
+  (message "%s" "refreshing package contents for install...")
+  (package-refresh-contents)
+  (message "%s" "installing all required packages")
+  (dolist (pkg subash-packages (message "setup complete"))
+	(when (not (package-installed-p pkg))
+	  (package-install pkg)))
+  (message "%s" "your editor is all setup"))
+
+(defun update-all-packages ()
+  (interactive)
+  (package-refresh-contents)
+  (dolist (pkg subash-packages (message "update complete"))
+	(package-install pkg)))
 
 ;; (defun all-my-packages-installed-p ()
 ;;   (setq my-packages-installed t)
