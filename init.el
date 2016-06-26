@@ -2,13 +2,7 @@
 ;; ============================= MY EMACS INIT ==============================
 ;;
 ;; ------------------------ BACKUP DIRECTORY ---------------------------------
-(setq backup-directory "~/.backups/")
-
-(setq backup-directory-alist
-      `((".*" . , backup-directory)))
-
-(setq auto-save-file-name-transforms
-      `((".*" , backup-directory nil)))
+(setq backup-directory "/Users/subhash_sharma/.backups/")
 
 ;;------------------------- LOAD FILES ---------------------------------------
 (add-to-list 'load-path "/Users/subhash_sharma/Code/tern/emacs/")
@@ -17,14 +11,22 @@
   '(progn
 	 (require 'tern-auto-complete)
 	 (tern-ac-setup)))
+;; go-template-mode is a gist from github which enables template editing in emacs.
+(add-to-list 'load-path "/Users/subhash_sharma/.emacs.d/standalone-libs/")
+(require 'go-template-mode)
+;; go-flymake and go-flycheck imports for go src files
+(add-to-list 'load-path "/Users/subhash_sharma/go/src/github.com/dougm/goflymake")
 ;;------------------------------ PACKAGES ------------------------------------
 (load "package")
 (package-initialize)
 (add-to-list 'package-archives
 			 '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
+;; ---------------------------- EXEC PATH FROM SHELL ------------------------
+(when (memq window-system '(mac-ns))
+  (exec-path-from-shell-initialize))
 ;; ;;------------------------ MY PACKAGE LIST -----------------------------------
-(defvar subash/packages '(auto-complete autopair column-marker company deft flx-ido go-mode magit org projectile smex solarized-theme tide web-mode yaml-mode) "Default Packages")
+(defvar subash/packages '(auto-complete autopair column-marker company deft flx-ido go-mode grizzl magit org projectile smex solarized-theme tide web-mode yaml-mode) "Default Packages")
 
 ;; (defun all-my-packages-installed-p ()
 ;;   (setq my-packages-installed t)
@@ -45,19 +47,21 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(auto-save-file-name-transforms '((".*" "/Users/subhash_sharma/.backups/" t)))
+ '(backup-directory-alist '((".*" . "/Users/subhash_sharma/.backups/")))
  '(column-marker-1 81)
  '(column-number-mode t)
+ '(custom-safe-themes
+   (quote
+	("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "55ed02951e7b458e4cd18837eefa1956884c9afd22bb514f697fd1d2d1abb3d3" default)))
+ '(echo-keystrokes 0.1)
  '(global-linum-mode 1)
  '(size-indication-mode t)
  '(tab-width 4)
- '(echo-keystrokes 0.1)
- '(use-dialog-box nil)
- '(visible-bell t)
  '(tool-bar-mode nil)
  '(tooltip-mode nil)
- '(custom-safe-themes
-   (quote
-	("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "55ed02951e7b458e4cd18837eefa1956884c9afd22bb514f697fd1d2d1abb3d3" default))))
+ '(use-dialog-box nil)
+ '(visible-bell t))
 
 ;; ------------------------- SPLASH SCREEN -----------------------------------
 ;; Disabling startup splash screen, setting the intial message to nil and
@@ -73,9 +77,13 @@
 (setq x-select-enable-clipboard t)
 
 ;; Removing scroll bars, tool bar and menu bar
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-(menu-bar-mode -1)
+;; only if a Window system is being used
+(if (display-graphic-p)
+	(progn
+	  (scroll-bar-mode -1)
+	  (tool-bar-mode -1)
+	  (menu-bar-mode -1)))
+
 
 ;; show matching parenthesis
 (show-paren-mode t)
@@ -140,12 +148,13 @@
 ;; Setting up the exec path since all node commands are found here
 (add-to-list 'exec-path "/usr/local/bin")
 ;; Setting up node exec path since version specific node commands can be found here
-(add-to-list 'exec-path "/Users/subhash_sharma/.nvm/versions/node/v5.1.0/bin")
-
+(add-to-list 'exec-path "/Users/subhash_sharma/.nvm/versions/node/v5.4.1/bin")
+;; Setting up path to contain $GOPATH/bin for running go commands
+(add-to-list 'exec-path "/Users/subhash_sharma/go/bin")
 ;;--------------------------- THEME ------------------------------------------
 (if window-system
 	(load-theme 'solarized-dark t)
-  (load-theme 'wombat t))
+  (load-theme 'tango-dark t))
 
 ;;---------------------------- SMEX SETTINGS ---------------------------------
 (require 'smex)
@@ -195,6 +204,7 @@
 (require 'projectile)
 (projectile-global-mode t)
 (setq projectile-enable-caching t)
+(setq projectile-completion-system 'grizzl)
 ;;----------------------- COMPANY MODE SETTINGS ------------------------------
 (require 'company)
 (global-set-key (kbd "C-c C-t") 'company-complete)
@@ -207,7 +217,8 @@
 			(tide-setup)
 			(flycheck-mode t)
 			(eldoc-mode )
-			(company-mode t)))
+			(company-mode t)
+			(global-auto-complete-mode nil)))
 (setq company-tooltip-align-annotations t)
 ;;--------------------------- WEB MODE ---------------------------------------
 
@@ -227,6 +238,44 @@
 			  (tide-setup)
 			  (flycheck-mode t)
 			  (eldoc-mode )
-			  (company-mode t))))
+			  (company-mode t)
+			  (global-auto-complete-mode nil))))
 ;;---------------------- TERN MODE -------------------------------------------
+;; Start tern when opening js files
 (add-hook 'js-mode-hook (lambda() (tern-mode t)))
+;;------------------------- GO MODE ------------------------------------------
+;; run gofmt before saving the file in go-mode
+(require 'company)
+(require 'company-go)
+;; (require 'go-flymake)
+(require 'go-flycheck)
+(add-hook 'go-mode-hook 'gofmt-before-save)
+(add-hook 'go-mode-hook (lambda ()
+						  ;; gocode does not work without this and the below one
+						  (exec-path-from-shell-copy-env "GOPATH")
+						  (exec-path-from-shell-copy-env "GOROOT")
+						  (push 'company-go company-backends)
+						  (company-mode)
+						  (flycheck-mode 1)
+						  (auto-complete-mode -1)
+						  (message "go mode is initialized")))
+(local-set-key (kbd "M-.") 'godef-jump)
+(local-set-key (kbd "C-c C-f") 'projectile-find-file)
+;;------------------------ MY BLOG -------------------------------------------
+(setq org-publish-project-alist
+      '(("my-blog"
+	      :base-directory "~/Code/profile/blogs/"
+	      :publishing-directory "~/Code/profile/output/blogs/"
+		  :org-html-html5-fancy t
+		  :publishing-function org-html-publish-to-html
+		  :recursive t)
+		("my-assets"
+		 :base-directory "~/Code/profile/assets/"
+		 :publishing-directory "~/Code/profile/output/assets/"
+		 :publishing-function org-publish-attachment
+		 :recursive t)
+		("my-css"
+		 :base-directory "~/Code/profile/style/"
+		 :publishing-directory "~/Code/profile/output/style/"
+		 :publishing-function org-publish-attachment
+		 :recursive t)))
