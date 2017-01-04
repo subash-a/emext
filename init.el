@@ -1,32 +1,36 @@
 ;;
 ;; ============================= MY EMACS INIT ==============================
 ;;
+;; --------------------------- CUSTOM VARS ----------------------------------
+(defvar BACKUP_DIRECTORY (concat (getenv "HOME" "/.backups/")))
+(defvar TERN_DIRECTORY (concat (getenv "HOME" "/code/tern/emacs")))
+(defvar MELPA_URL "http://melpa.milkbox.net/packages/")
+(defvar subash/packages '(auto-complete autopair column-marker company
+										company-go deft flx-ido go-mode
+										flycheck-gometalinter
+										grizzl magit org projectile smex
+										solarized-theme tide web-mode
+										yaml-mode) "Default Packages")
 ;; ------------------------ BACKUP DIRECTORY ---------------------------------
-(setq backup-directory "/Users/subhash_sharma/.backups/")
-
+(setq backup-directory BACKUP_DIRECTORY)
 ;;------------------------- LOAD FILES ---------------------------------------
-(add-to-list 'load-path "/Users/subhash_sharma/Code/tern/emacs/")
+(add-to-list 'load-path TERN_DIRECTORY)
 (autoload 'tern-mode "tern.el" nil t)
 (eval-after-load 'tern
   '(progn
 	 (require 'tern-auto-complete)
 	 (tern-ac-setup)))
-;; go-template-mode is a gist from github which enables template editing in emacs.
-(add-to-list 'load-path "/Users/subhash_sharma/.emacs.d/standalone-libs/")
-(require 'go-template-mode)
-;; go-flymake and go-flycheck imports for go src files
-(add-to-list 'load-path "/Users/subhash_sharma/go/src/github.com/dougm/goflymake")
 ;;------------------------------ PACKAGES ------------------------------------
 (load "package")
 (package-initialize)
 (add-to-list 'package-archives
-			 '("melpa" . "http://melpa.milkbox.net/packages/") t)
+			 '("melpa" . MELPA_URL) t)
 
 ;; ---------------------------- EXEC PATH FROM SHELL ------------------------
 (when (memq window-system '(mac-ns))
   (exec-path-from-shell-initialize))
 ;; ;;------------------------ MY PACKAGE LIST -----------------------------------
-(defvar subash/packages '(auto-complete autopair column-marker company company-go deft flx-ido go-mode grizzl magit org projectile smex solarized-theme tide web-mode yaml-mode) "Default Packages")
+
 (defun setup-editor ()
   (interactive)
   (message "%s" "refreshing package contents for install...")
@@ -62,8 +66,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(auto-save-file-name-transforms '((".*" "/Users/subhash_sharma/.backups/" t)))
- '(backup-directory-alist '((".*" . "/Users/subhash_sharma/.backups/")))
+ '(auto-save-file-name-transforms '((".*" BACKUP_DIRECTORY t)))
+ '(backup-directory-alist '((".*" . BACKUP_DIRECTORY)))
  '(column-marker-1 81)
  '(column-number-mode t)
  '(custom-safe-themes
@@ -152,20 +156,11 @@
 ;;--------------------------- HOOKS ------------------------------------------
 ;; Deleting white space before saving a file
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-;; (defun pre-save-typescript ()
-;;   "Before saving typescript files do this"
-;;   (if (eq major-mode 'typescript-mode)
-;; 	  (shell-command-on-region (point-min) (point-max) "/Users/subhash_sharma/Modelogiq/frontend/node_modules/.bin/tsfmt --stdin" (current-buffer) t)))
-;; (add-hook 'before-save-hook 'pre-save-typescript)
 ;;-------------------------- PATH AND ENV SETTINGS ---------------------------
 ;; Setting up path for node support by including the path to node_modules
 (setenv "PATH" (concat "/usr/local/bin:" (getenv "PATH")))
 ;; Setting up the exec path since all node commands are found here
 (add-to-list 'exec-path "/usr/local/bin")
-;; Setting up node exec path since version specific node commands can be found here
-(add-to-list 'exec-path "/Users/subhash_sharma/.nvm/versions/node/v5.4.1/bin")
-;; Setting up path to contain $GOPATH/bin for running go commands
-(add-to-list 'exec-path "/Users/subhash_sharma/go/bin")
 ;;--------------------------- THEME ------------------------------------------
 (if window-system
 	(load-theme 'solarized-dark t)
@@ -184,19 +179,6 @@
 ;;-------------------------- AUTOPAIR SETTINGS -------------------------------
 (require 'autopair)
 (autopair-global-mode)
-;;--------------------------- ORG MODE ---------------------------------------
-;; (require 'org)
-;; Overriding some solarized theme settings which mess with org mode
-;; (require 'solarized)
-;; (defun my-org-hook ()
-;;   (setq solarized-use-variable-pitch nil)
-;;   (setq solarized-height-plus-4 1.0)
-;;   (setq solarized-height-plus-3 1.0)
-;;   (setq solarized-height-plus-2 1.0)
-;;   (setq solarized-height-plus-1 1.0)
-;;   (setq solarized-height-minus-1 1.0))
-;; (add-hook 'org-mode-hook 'my-org-hook)
-;;--------------------------- CUSTOMIZED HOOKS--------------------------------
 ;;--------------------------- DEFT MODE --------------------------------------
 (require 'deft)
 (setq deft-extensions '("txt" "org" "md"))
@@ -207,14 +189,14 @@
 (global-set-key [f8] 'deft)
 ;;-------------------------- TYPESCRIPT MODE----------------------------------
 ;; Added typescript linter for checking code when saved
-(require 'flycheck)
-(flycheck-define-checker typescript-tslint
-  "Linter for typescript code"
-  :command ("/Users/subhash_sharma/Modelogiq/frontend/node_modules/.bin/tslint" "--config /Users/subhash_sharma/Modelogiq/frontend/tslint.json" source-original)
-  :error-patterns ((error line-start (file-name) "[" line ", " column "]:" (message) line-end))
-  :modes (typescript-mode))
-(add-to-list 'flycheck-checkers 'typescript-tslint)
-(setq flycheck-check-syntax-automatically '(mode-enabled save))
+;; (require 'flycheck)
+;; (flycheck-define-checker typescript-tslint
+;;   "Linter for typescript code"
+;;   :command ("/Users/subhash_sharma/Modelogiq/frontend/node_modules/.bin/tslint" "--config /Users/subhash_sharma/Modelogiq/frontend/tslint.json" source-original)
+;;   :error-patterns ((error line-start (file-name) "[" line ", " column "]:" (message) line-end))
+;;   :modes (typescript-mode))
+;; (add-to-list 'flycheck-checkers 'typescript-tslint)
+;; (setq flycheck-check-syntax-automatically '(mode-enabled save))
 ;;------------------------ PROJECTILE SETTINGS -------------------------------
 (require 'projectile)
 (projectile-global-mode t)
