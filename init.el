@@ -7,7 +7,7 @@
 (defvar MELPA_URL "http://melpa.milkbox.net/packages/")
 (defvar subash/packages '(auto-complete autopair column-marker company
 										company-go deft flx-ido go-mode
-										flycheck-gometalinter
+										go-eldoc flycheck-gometalinter
 										grizzl magit org projectile smex
 										solarized-theme tide web-mode
 										yaml-mode) "Default Packages")
