@@ -1,0 +1,6 @@
+(defun testing-dolist ()
+  (create-file-buffer "temp1")
+  (setq res ())
+  (dolist (token '("hello" "world") res) (concat res token))
+  (print res))
+(testing-dolist)
